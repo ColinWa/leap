@@ -1,0 +1,34 @@
+<ons-template id="profiledlgtemplate.html">
+  <ons-dialog var="profileUpdateDialog" ng-controller="userProfileController" cancelable>
+
+    <ons-toolbar inline>
+      <div class="center">
+        Update Your Profile
+      </div>
+    </ons-toolbar>
+      
+     <p>
+      <input placeholder="Username" id="email" ng-model="email" class="text-input" ng-minlength="5"
+       ng-maxlength="40"
+       ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"
+       required>
+    </p>
+
+    <p>
+      <input placeholder="ID Number" id="idnumber" string-to-number ng-model="idnumber" class="text-input">
+    </p>
+
+    <p>
+      <input placeholder="First Name" id="firstname" ng-model="firstname" class="text-input">
+    </p>
+      
+    <p>
+      <input placeholder="Last Name" id="lastname" ng-model="lastname" class="text-input">
+    </p>
+
+    <p>
+      <ons-button modifier="large" ng-click="updateProfile()">Update</ons-button>
+    </p>
+
+  </ons-dialog>
+</ons-template>

@@ -1,0 +1,26 @@
+{
+    "jscodehints.detectedExclusions": [
+        "/Users/mac/Apps/leap/lib/swiper.min.js",
+        "/Users/mac/Apps/leap/bower_components/nvd3/package.js",
+        "/Users/mac/Apps/leap/lib/onsen/js/onsenui.min.js",
+        "/Users/mac/Apps/leap/lib/onsen/js/onsenui_all.js",
+        "/Users/mac/Apps/leap/lib/onsen/js/onsenui_all.min.js",
+        "/Users/mac/Apps/leap/lib/swiper.js",
+        "/Users/mac/Apps/leap/lib/onsen/js/onsenui.js",
+        "/Users/mac/Apps/leap/lib/onsen/js/angular/angular.min.js",
+        "/Users/mac/Apps/leap/lib/onsen/js/angular/angular.js",
+        "/Users/mac/Apps/leap/lib/onsen/js/angular/angular-touch.js",
+        "/Users/mac/Apps/leap/lib/onsen/js/angular/angular-animate.js",
+        "/Users/mac/Apps/leap/lib/nv.d3.js",
+        "/Users/mac/Apps/leap/lib/d3.js",
+        "/Users/mac/Apps/leap/lib/angular-nvd3.js",
+        "/Users/mac/Apps/leap/gulpfile.js",
+        "/Users/mac/Apps/leap/bower_components/nvd3/meteor/export.js",
+        "/Users/mac/Apps/leap/bower_components/nvd3/build/nv.d3.min.js",
+        "/Users/mac/Apps/leap/bower_components/nvd3/build/nv.d3.js",
+        "/Users/mac/Apps/leap/providers/services/twitter-provider.js",
+        "/Users/mac/Apps/leap/bower_components/d3/d3.min.js",
+        "/Users/mac/Apps/leap/bower_components/d3/d3.js",
+        "/Users/mac/Apps/leap/bower_components/Chart.js/test/scale.time.tests.js"
+    ]
+}
