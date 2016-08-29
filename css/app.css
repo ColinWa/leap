@@ -100,6 +100,31 @@
   background: url('../images/menu/icons/clinic.png') center/contain no-repeat;
 }
 
+.btn-distance-school {
+    
+    width: 99px;
+    text-align: center;
+}
+
+.btn-distance-artcentre{
+    width: 99px;
+}
+
+.btn-distance-parks{
+     width: 99px;
+    text-align: center;
+}
+
+.btn-distance-voting{
+    width: 99px;
+    text-align: center;
+}
+
+
+.btn-distance {
+    width: 110px;
+}
+
 @media only screen and (max-width: 300px) {
   .voting-icon {
     font-size: 30px;
@@ -125,7 +150,7 @@ background-color: #009955;
 }
 
 .infoWindowContent {
-        font-size: 14px !important;
+        font-size: 10px !important;
         border-top: 1px solid #ccc;
         padding-top: 10px;
     }
