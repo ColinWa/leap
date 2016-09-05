@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    var app = angular.module('app', ['onsen', 'angular-images-loaded', 'ngMap', 'nvd3']);
+    var app = angular.module('app', ['onsen', 'angular-images-loaded', 'ngMap', 'nvd3', 'ngMessages']);
 
 
     // Filter to convert HTML content to string by removing all HTML tags
@@ -311,13 +311,13 @@
         };
     });
 
-    app.controller('branchesController', function ($http, $scope, $filter, $rootScope, $compile, $sce, loadingMessageService) {
+    app.controller('branchesController', function ($http, $scope, $filter, $rootScope, $compile, $sce, loadingMessageService, appConfig) {
 
         $scope.getAll = true;
         $scope.locationsType = 'map';
         $scope.centerMap = [40.7112, -74.213]; // Start Position
 
-        $scope.API = 'http://munipoiapp.herokuapp.com/api/';
+        $scope.API = appConfig.municloudapiEndPoint; //'http://munipoiapp.herokuapp.com/api/';
 
         if ($rootScope.searchOptions == true)
             $scope.API = $scope.API + 'pois?artcentres=' + $rootScope.artcentre + '&schools=' + $rootScope.schools + '&votingstations=' + $rootScope.votingstations + '&parks=' + $rootScope.parks;
@@ -359,7 +359,7 @@
 
         // true is to show ALL locations, false to show ONLY closests locations
         $scope.checkIfLoggedIn = function (value, locationType) {
-            $scope.isLoggedIn = window.localStorage.getObject("loggedIn");
+            $scope.isLoggedIn = true; //window.localStorage.getObject("loggedIn");
 
             if (!$scope.isLoggedIn) {
                 appNavigator.pushPage('signinsocial.html');
@@ -405,7 +405,7 @@
 
             } else {
 
-                $scope.API = "http://196.15.242.146:5555/rest/EMMPerson/resources/customer/{";
+                $scope.API = appConfig.emmregistercustomerapiEndPoint; //"http://196.15.242.146:5555/rest/EMMPerson/resources/customer/{";
 
                 $scope.API = $scope.API + '"phoneNumber":"' + $scope.phoneNumber + '","email":"' + $scope.email + '","name":"' + $scope.firstname + '","surname":"' + $scope.lastname + '","password":"' + $scope.password + '","idNumber":"' + $scope.idNumber + '"}';
 
@@ -556,7 +556,7 @@
 
                     var radius = appNavigator.getCurrentPage().options.radius;
 
-                    $scope.API = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + $scope.userLat + "," + $scope.userLng + "&radius=" + radius + "&type=police&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                    $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=" + radius + "&type=police&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
 
                     $http.get($scope.API).success(function (response) {
 
@@ -627,7 +627,7 @@
                 $scope.userLat = position.coords.latitude;
                 $scope.userLng = position.coords.longitude;
 
-                $scope.API = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=police&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=police&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
 
                 $http.get($scope.API).success(function (response) {
 
@@ -740,7 +740,7 @@
 
         $scope.pullMarkersContent = function () {
 
-            $scope.API = "http://munipoiapp.herokuapp.com/api/pois";
+            $scope.API = appConfig.poiapiEndPoint; //"http://munipoiapp.herokuapp.com/api/pois";
 
             $scope.API = $scope.API + '?' + $rootScope.optionselected + '=true'
 
@@ -759,7 +759,7 @@
 
         $scope.pullContent = function () {
 
-            $scope.API = "http://munipoiapp.herokuapp.com/api/pois";
+            $scope.API = appConfig.poiapiEndPoint;;
 
             if ($scope.getAll)
                 $scope.API = $scope.API + '?pageNumber=' + $scope.pageNumber + '&num=10&' + $rootScope.optionselected + '=true'
@@ -942,7 +942,7 @@
         }
 
         $scope.showMap = function (dlat, dlon) {
-            var link = "http://maps.google.com/maps?saddr=" + $scope.userLat + "," + $scope.userLng + "&daddr=" + dlat + "," + dlon;
+            var link = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&daddr=" + dlat + "," + dlon;
             console.log(link);
 
             window.location = link;
@@ -1046,7 +1046,7 @@
 
             var marker = $scope.markers[$(this).attr('data-marker')];
 
-            var link = "http://maps.google.com/maps?saddr=" + $scope.userLat + "," + $scope.userLng + "&daddr=" + marker.location[0] + "," + marker.location[1];
+            var link = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&daddr=" + marker.location[0] + "," + marker.location[1];
             console.log(link);
 
             window.location = link;
@@ -1200,7 +1200,7 @@
         $scope.loadMarkers = function (type) {
 
 
-            $scope.API = "http://munipoiapp.herokuapp.com/api/pois";
+            $scope.API = appConfig.poiapiEndPoint; //"http://munipoiapp.herokuapp.com/api/pois";
 
             $scope.API = $scope.API + '?' + type + '=true'
 
@@ -1254,7 +1254,7 @@
                 $scope.userLat = position.coords.latitude;
                 $scope.userLng = position.coords.longitude;
 
-                $scope.API = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
 
                 $http.get($scope.API).success(function (response) {
 
@@ -1320,7 +1320,7 @@
                 $scope.userLat = position.coords.latitude;
                 $scope.userLng = position.coords.longitude;
 
-                $scope.API = "http://196.15.242.146:5555/rest/EMMLocation/resources/getClinicData";
+                $scope.API = appConfig.emmclinicapiEndPoint;
 
                 $http.get($scope.API).success(function (response) {
 
@@ -1379,7 +1379,7 @@
        
        $scope.getDirections = function (lat,lot) {
            
-            var link = "http://maps.google.com/maps?saddr=" + $scope.userLat + "," + $scope.userLng + "&daddr=" + lat + "," + lot;
+            var link = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&daddr=" + lat + "," + lot;
             console.log(link);
 
             window.location = link;
@@ -1499,7 +1499,7 @@
         $rootScope.title = "";
         $scope.ads = [];
         $scope.category = "";
-        $scope.API = 'http://munipoiapp.herokuapp.com/api/';
+        $scope.API = appConfig.municloudapiEndPoint;// 'http://munipoiapp.herokuapp.com/api/';
 
 
         // true is to show ALL locations, false to show ONLY closests locations
@@ -1703,9 +1703,9 @@
                 var radius = appNavigator.getCurrentPage().options.radius;
 
                 if (poiType == 'All')
-                    $scope.API = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
                 else
-                    $scope.API = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
 
                 $http.get($scope.API).success(function (response) {
 
@@ -1805,9 +1805,9 @@
                 $scope.centerMap = [$scope.userLat, $scope.userLng]; // Start Position
 
                 if (poiType == 'All')
-                    $scope.API = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + $scope.userLat + "," + $scope.userLng + "&radius=2000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=2000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
                 else
-                    $scope.API = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + $scope.userLat + "," + $scope.userLng + "&radius=5000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=5000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
 
                 $http.get($scope.API).success(function (response) {
 
@@ -1938,7 +1938,7 @@
 
             } else {
 
-                $scope.API = "http://196.15.242.146:5555/rest/EMMPerson/resources/customerLogIn/{";
+                $scope.API = appConfig.emmloginapiEndPoint;
 
                 $scope.API = $scope.API + '"username":"' + $scope.username + '","password":"' + $scope.password + '"}';
 
@@ -1982,7 +1982,7 @@
 
             } else {
 
-                $scope.API = "http://196.15.242.146:5555/rest/EMMPerson/resources/recoverPassword/{";
+                $scope.API = appConfig.emmpasswordrecoveryapiEndPoint;
                 $scope.API = $scope.API + '"emailAddress":"' + $scope.email + '"}';
 
                 $http.get($scope.API).success(function (response) {
@@ -2012,7 +2012,7 @@
 
         $scope.pullContent = function () {
 
-            $scope.API = "http://196.15.242.146:5555/rest/EMMPerson/resources/getVotersPersonDetails/" + id;
+            $scope.API = appConfig.emmvoterspersondetailsapiEndPoint + id;
 
             window.localStorage.setItem("idNumber", id);
 
@@ -2026,7 +2026,7 @@
 
         $scope.pullMeterContent = function () {
 
-            $scope.API = "http://196.15.242.146:5555/rest/EMMSuprema/resources/getMeterDetails/64010";
+            $scope.API = appConfig.emmmetersapiEndPoint;// "http://196.15.242.146:5555/rest/EMMSuprema/resources/getMeterDetails/64010";
 
             window.localStorage.setItem("meternumber", "64010");
 
@@ -2044,7 +2044,7 @@
         }
 
         $scope.getDirections = function () {
-            var link = "http://maps.google.com/maps?saddr=" + $scope.userLat + "," + $scope.userLng + "&daddr=" + $scope.votingdetails.Voter.VotingStation.Location.Latitude + "," + $scope.votingdetails.Voter.VotingStation.Location.Longitude;
+            var link = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&daddr=" + $scope.votingdetails.Voter.VotingStation.Location.Latitude + "," + $scope.votingdetails.Voter.VotingStation.Location.Longitude;
             console.log(link);
 
             window.location = link;
@@ -2070,7 +2070,7 @@
         }
 
         $scope.getDirections = function (dlat, dlon) {
-            var link = "http://maps.google.com/maps?saddr=" + $scope.userLat + "," + $scope.userLng + "&daddr=" + $scope.votingdetails.Voter.VotingStation.Location.Latitude + "," + $scope.votingdetails.Voter.VotingStation.Location.Longitude;
+            var link = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&daddr=" + $scope.votingdetails.Voter.VotingStation.Location.Latitude + "," + $scope.votingdetails.Voter.VotingStation.Location.Longitude;
             console.log(link);
 
             window.location = link;
@@ -2138,7 +2138,7 @@
             $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
             modal.show();
 
-            $scope.API = "http://196.15.242.146:5555/rest/EMMMobiApp/resource/getCaseHistory/{";
+            $scope.API = appConfig.emmcasehistoryapiEndPoint;
 
             $scope.API = $scope.API + '"days":"100","CRMID":"2571133"}';
 
@@ -2158,7 +2158,7 @@
         }
 
         $scope.getDirections = function (dlat, dlon) {
-            var link = "http://maps.google.com/maps?saddr=" + $scope.userLat + "," + $scope.userLng + "&daddr=" + $scope.votingdetails.Voter.VotingStation.Location.Latitude + "," + $scope.votingdetails.Voter.VotingStation.Location.Longitude;
+            var link = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&daddr=" + $scope.votingdetails.Voter.VotingStation.Location.Latitude + "," + $scope.votingdetails.Voter.VotingStation.Location.Longitude;
             console.log(link);
 
             window.location = link;
@@ -2265,18 +2265,6 @@
 
                 legend: {
                     "enable": false
-
-                    //                    margin: {
-                    //
-                    //                        top: 5,
-                    //
-                    //                        right: 35,
-                    //
-                    //                        bottom: 5,
-                    //
-                    //                        left: 0
-                    //
-                    //                    }
 
                 },
 
@@ -2726,7 +2714,7 @@
 
             $scope.resultsDetails = {};
 
-            $scope.API = "http://196.15.242.146:5555/rest/EMMPerson/resources/getLatestResultIn";
+            $scope.API = appConfig.emmvotingstatsapiEndPoint;
             $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
             modal.show();
 
@@ -2868,7 +2856,7 @@
 
         $scope.numOfCalls = 0; //JSON.parse(localStorage.getItem('appLocalStorageUser'));
 
-        $scope.API = 'http://196.15.242.146:5555/rest/EMMMobiApp/resource/createIncidentReport/';
+        $scope.API = appConfig.emmcreateincidentapiEndPoint;
 
         $scope.list = [{
             "id": "1",
@@ -2976,7 +2964,7 @@
 
     app.controller('talkToCounsellorController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
 
-        $scope.API = 'http://196.15.242.146:5555/rest/EMMMobiApp/resource/complaints/';
+        $scope.API = AppConfig.emmcomplainsapiEndPoint;
 
         $scope.incidenttypelist = [{
             "id": "51",
@@ -3059,7 +3047,7 @@
 
         $scope.pullContent = function () {
 
-            $scope.API = "http://196.15.242.146:5555/rest/EMMMobiApp/resource/retrieveComplaint";
+            $scope.API = appConfig.emmretrievecomplaintapiEndPoint; //"http://196.15.242.146:5555/rest/EMMMobiApp/resource/retrieveComplaint";
 
             $http.get($scope.API).success(function (response) {
 
