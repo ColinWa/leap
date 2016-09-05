@@ -2221,7 +2221,6 @@
 
             appNavigator.pushPage('casehistory.html');
 
-
         }
 
     }]);
