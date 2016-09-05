@@ -21,6 +21,7 @@ app
   emmretrievecomplaintapiEndPoint : 'http://196.15.242.146:5555/rest/EMMMobiApp/resource/retrieveComplaint',
     
   notificationapiEndPoint : 'https://onesignal.com/api/v1/notifications'
+
   
 })
 .value('curSymbol', {
