@@ -1687,7 +1687,6 @@
         $scope.userLat = 0;
         $scope.userLng = 0;
 
-
         $scope.init = function initMap(poiType) {
 
             $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
