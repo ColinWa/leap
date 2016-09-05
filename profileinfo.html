@@ -5,9 +5,11 @@
         <div class="center">Additional Info</div>
     </ons-toolbar>
 
+    <form name="profileForm">
     <div class="login-form">
 
         
+<<<<<<< 20cd3ebe6ca0107d52613442c7d54bf4d2e8f199
          <form name="profileInfo" class="elegant-aero"  ng-submit="Additional Info()">
              <ons-list modifier="inset" style="margin-top: 10px">
              <ons-list-item>
@@ -19,6 +21,13 @@
                    </ons-list-item> 
                  <ons-list-item>
         <input type="password" class="text-input--underbar" ng-model="password" placeholder="Password" value="" required>
+=======
+        <input type="number" class="text-input--underbar" ng-model="idNumber" placeholder="ID Number" value=""> (OPTIONAL)
+        
+        
+        <input type="number" class="text-input--underbar" ng-model="phoneNumber" placeholder="Phone Number" value="">
+        <input type="password" class="text-input--underbar" ng-model="password" placeholder="Password" value="">
+>>>>>>> validations
         <br><br>
                </ons-list-item>        
         
@@ -32,5 +41,6 @@
              </form>
         
       </div>
+    </form>
     
 </ons-page>
