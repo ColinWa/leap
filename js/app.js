@@ -1073,7 +1073,7 @@
 
     });
 
-    app.controller('mapController', ['$http', '$scope', '$rootScope', '$compile', function ($http, $scope, $rootScope, $compile) {
+    app.controller('mapController', ['$http', '$scope', '$rootScope', '$compile','appConfig', function ($http, $scope, $rootScope, $compile,appConfig) {
 
         $scope.map;
         $scope.overlay;
@@ -1494,7 +1494,7 @@
         }
     }]);
 
-    app.controller('categoryController', ['$http', '$scope', '$rootScope', '$sce', function ($http, $scope, $rootScope, $sce) {
+    app.controller('categoryController', ['$http', '$scope', '$rootScope', '$sce','appConfig', function ($http, $scope, $rootScope, $sce, appConfig) {
 
         $rootScope.title = "";
         $scope.ads = [];
@@ -2001,7 +2001,7 @@
 
     }]);
 
-    app.controller('profileController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    app.controller('profileController', ['$scope', '$rootScope', '$sce', '$http','appConfig', function ($scope, $rootScope, $sce, $http, appConfig) {
 
         var page = appNavigator.getCurrentPage();
         var id = page.options.id;
@@ -2852,7 +2852,7 @@
     }]);
 
 
-    app.controller('logCallsController', ['$http', '$scope', '$rootScope', '$sce', function ($http, $scope, $rootScope, $sce) {
+    app.controller('logCallsController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', function ($http, $scope, $rootScope, $sce, appConfig) {
 
         $scope.numOfCalls = 0; //JSON.parse(localStorage.getItem('appLocalStorageUser'));
 
