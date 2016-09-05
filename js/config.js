@@ -3,7 +3,6 @@
 app
 .constant('appConfig', {
   municloudapiEndPoint: 'http://munipoiapp.herokuapp.com/api/',
- 
   nearbysearchapiEndPoint : 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=',
   poiapiEndPoint : 'http://munipoiapp.herokuapp.com/api/pois',
   googledirectionapiEndPoint : 'http://maps.google.com/maps?saddr=',
