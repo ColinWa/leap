@@ -1680,7 +1680,7 @@
 
     }]);
 
-    app.controller('poiController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    app.controller('poiController', ['$scope', '$rootScope', '$sce', '$http', 'loadingMessageService','appConfig', function ($scope, $rootScope, $sce, $http, loadingMessageService,appConfig) {
 
         $scope.locations = [];
         $scope.locationsType = 'map';
@@ -1703,9 +1703,9 @@
                 var radius = appNavigator.getCurrentPage().options.radius;
 
                 if (poiType == 'All')
-                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                    $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
                 else
-                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                    $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
 
                 $http.get($scope.API).success(function (response) {
 
@@ -2229,7 +2229,7 @@
 
     }]);
 
-    app.controller('statsController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    app.controller('statsController', ['$scope', '$rootScope', '$sce', '$http', 'appConfig', function ($scope, $rootScope, $sce, $http, appConfig) {
 
         $scope.options = {
 
