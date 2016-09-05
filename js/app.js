@@ -1786,7 +1786,6 @@
 
         }
 
-
         $scope.loadPOI = function (poiType) {
 
             $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
