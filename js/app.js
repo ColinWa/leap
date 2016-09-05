@@ -1,5 +1,4 @@
 // In this file we are goint to include all the Controllers our app it's going to need
-
 (function () {
     'use strict';
 
@@ -1073,7 +1072,7 @@
 
     });
 
-    app.controller('mapController', ['$http', '$scope', '$rootScope', '$compile', function ($http, $scope, $rootScope, $compile) {
+    app.controller('mapController', ['$http', '$scope', '$rootScope', '$compile','appConfig', function ($http, $scope, $rootScope, $compile,appConfig) {
 
         $scope.map;
         $scope.overlay;
@@ -1494,7 +1493,7 @@
         }
     }]);
 
-    app.controller('categoryController', ['$http', '$scope', '$rootScope', '$sce', function ($http, $scope, $rootScope, $sce) {
+    app.controller('categoryController', ['$http', '$scope', '$rootScope', '$sce','appConfig', function ($http, $scope, $rootScope, $sce, appConfig) {
 
         $rootScope.title = "";
         $scope.ads = [];
@@ -1680,13 +1679,12 @@
 
     }]);
 
-    app.controller('poiController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    app.controller('poiController', ['$scope', '$rootScope', '$sce', '$http', 'loadingMessageService','appConfig', function ($scope, $rootScope, $sce, $http, loadingMessageService,appConfig) {
 
         $scope.locations = [];
         $scope.locationsType = 'map';
         $scope.userLat = 0;
         $scope.userLng = 0;
-
 
         $scope.init = function initMap(poiType) {
 
@@ -1703,9 +1701,9 @@
                 var radius = appNavigator.getCurrentPage().options.radius;
 
                 if (poiType == 'All')
-                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                    $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
                 else
-                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                    $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
 
                 $http.get($scope.API).success(function (response) {
 
@@ -1786,7 +1784,6 @@
             }
 
         }
-
 
         $scope.loadPOI = function (poiType) {
 
@@ -2001,7 +1998,7 @@
 
     }]);
 
-    app.controller('profileController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    app.controller('profileController', ['$scope', '$rootScope', '$sce', '$http','appConfig', function ($scope, $rootScope, $sce, $http, appConfig) {
 
         var page = appNavigator.getCurrentPage();
         var id = page.options.id;
@@ -2224,12 +2221,11 @@
 
             appNavigator.pushPage('casehistory.html');
 
-
         }
 
     }]);
 
-    app.controller('statsController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    app.controller('statsController', ['$scope', '$rootScope', '$sce', '$http', 'appConfig', function ($scope, $rootScope, $sce, $http, appConfig) {
 
         $scope.options = {
 
@@ -2852,7 +2848,7 @@
     }]);
 
 
-    app.controller('logCallsController', ['$http', '$scope', '$rootScope', '$sce', function ($http, $scope, $rootScope, $sce) {
+    app.controller('logCallsController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', function ($http, $scope, $rootScope, $sce, appConfig) {
 
         $scope.numOfCalls = 0; //JSON.parse(localStorage.getItem('appLocalStorageUser'));
 
