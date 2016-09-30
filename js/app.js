@@ -2907,7 +2907,6 @@
          
      }]);
 
-
     app.controller('logCallsController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', function ($http, $scope, $rootScope, $sce, appConfig) {
 
         $scope.numOfCalls = 0;
