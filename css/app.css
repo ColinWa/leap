@@ -341,6 +341,11 @@ background-color: #FF9800;
   opacity: 0.6;
 }
 
+.ons-icon {
+    vertical-align: 0px;
+}
+
+
 .profile-desc {
   font-size: 15px;
   opacity: 0.6;

@@ -2,9 +2,9 @@
     <ons-page ng-controller="branchesController" ng-init="checkIfLoggedIn()">
         <ons-toolbar fixed-style>
            <div class="left">
-                <!--<ons-toolbar-button ng-click="signOut()">
-                    <ons-icon icon="ion-log-out" fixed-width="false"></ons-icon>
-                </ons-toolbar-button>-->
+                <ons-toolbar-button ng-click="appNavigator.pushPage('voice-search.html')">
+                    <ons-icon icon="ion-speakerphone" fixed-width="false"></ons-icon>
+                </ons-toolbar-button>
             </div>
             <div class="center"><img src="icon.png" height="45"/></div>
         

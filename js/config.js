@@ -18,6 +18,7 @@ app
   emmloginapiEndPoint : 'http://196.15.242.146:5555/rest/EMMPerson/resources/customerLogIn/{',
   emmpasswordrecoveryapiEndPoint : 'http://196.15.242.146:5555/rest/EMMPerson/resources/recoverPassword/{',
   emmretrievecomplaintapiEndPoint : 'http://196.15.242.146:5555/rest/EMMMobiApp/resource/retrieveComplaint',
+  emmsupremaEndPoint : 'http://196.15.242.146:5555/rest/EMMSuprema/resources/getPrepaidVending/',
     
   notificationapiEndPoint : 'https://onesignal.com/api/v1/notifications'
 
