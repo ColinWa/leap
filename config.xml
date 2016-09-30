@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
     <!-- config.xml reference: https://build.phonegap.com/docs/config-xml -->
-    <widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.leap" versionCode="1343" version="0.0.8">
+    <widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.leap" versionCode="1344" version="0.0.9">
 
         <name>LEAP</name>
 
@@ -82,6 +82,7 @@
         <gap:plugin name="org.apache.cordova.splashscreen" />
         <gap:plugin name="org.apache.cordova.vibration" />
         <gap:plugin name="onesignal-cordova-plugin" source="npm" />
+        <gap:plugin name="com.aserputko.speech.speechrecognition" spec="0.0.1" source="pgb" />
 
 
         <!-- Third party plugins -->

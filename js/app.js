@@ -1,5 +1,4 @@
 // In this file we are goint to include all the Controllers our app it's going to need
-
 (function () {
     'use strict';
 
@@ -1073,7 +1072,7 @@
 
     });
 
-    app.controller('mapController', ['$http', '$scope', '$rootScope', '$compile', function ($http, $scope, $rootScope, $compile) {
+    app.controller('mapController', ['$http', '$scope', '$rootScope', '$compile', 'appConfig', function ($http, $scope, $rootScope, $compile, appConfig) {
 
         $scope.map;
         $scope.overlay;
@@ -1149,7 +1148,7 @@
             });
 
         };
-        
+
         $scope.signOut = function () {
 
             window.localStorage.removeItem("username");
@@ -1187,7 +1186,7 @@
 
             if (type == "poi")
                 $scope.loadPOIMarkers();
-            else if(type == "clinics")
+            else if (type == "clinics")
                 $scope.loadClinicsMarkers();
             else
                 $scope.loadMarkers(type);
@@ -1227,17 +1226,17 @@
                     });
 
                     $scope.markers.push(marker);
-                    
+
                     marker.content = "<div><p>" + marker.title + "</p><input type='submit' ng-click='getDirections(" + marker.position.lat() + "," + marker.position.lng() + ")' class='btn-distance' value='Directions' /></div>";
 
-                    google.maps.event.addListener(marker, 'click', (function (marker, i,$scope) {
+                    google.maps.event.addListener(marker, 'click', (function (marker, i, $scope) {
                         return function () {
                             var compiled = $compile(marker.content)($scope);
                             $scope.$apply();
                             infowindow.setContent(compiled[0]);
                             infowindow.open(map, marker);
                         }
-                    })(marker, i,$scope));
+                    })(marker, i, $scope));
 
                 }
 
@@ -1271,15 +1270,15 @@
                         });
 
                         $scope.markers.push(marker);
-                        
+
                         marker.content = "<div><h3>" + marker.title + "</h3><input type='submit' ng-click='getDirections(" + marker.position.lat() + "," + marker.position.lng() + ")' class='btn-distance' value='Directions' /></div>";
 
                         google.maps.event.addListener(marker, 'click', (function (marker, index) {
                             return function () {
                                 //infowindow.setContent($scope.locations[index].name);
-                            var compiled = $compile(marker.content)($scope);
-                            $scope.$apply();
-                            infowindow.setContent(compiled[0]);
+                                var compiled = $compile(marker.content)($scope);
+                                $scope.$apply();
+                                infowindow.setContent(compiled[0]);
                                 infowindow.open(map, marker);
                             }
                         })(marker, index));
@@ -1310,8 +1309,8 @@
             });
 
         }
-        
-       $scope.loadClinicsMarkers = function () {
+
+        $scope.loadClinicsMarkers = function () {
 
             modal.show();
 
@@ -1337,15 +1336,15 @@
                         });
 
                         $scope.markers.push(marker);
-                        
+
                         marker.content = "<div><h3>" + marker.title + "</h3><input type='submit' ng-click='getDirections(" + marker.position.lat() + "," + marker.position.lng() + ")' class='btn-distance' value='Directions' /></div>";
 
                         google.maps.event.addListener(marker, 'click', (function (marker, index) {
                             return function () {
                                 //infowindow.setContent($scope.locations[index].ClinicAddress);
                                 var compiled = $compile(marker.content)($scope);
-                            $scope.$apply();
-                            infowindow.setContent(compiled[0]);
+                                $scope.$apply();
+                                infowindow.setContent(compiled[0]);
                                 infowindow.open(map, marker);
                             }
                         })(marker, index));
@@ -1376,9 +1375,15 @@
             });
 
         }
+<<<<<<< HEAD
+
+        $scope.getDirections = function (lat, lot) {
+
+=======
        
        $scope.getDirections = function (lat,lot) {
            
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
             var link = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&daddr=" + lat + "," + lot;
             console.log(link);
 
@@ -1494,12 +1499,16 @@
         }
     }]);
 
-    app.controller('categoryController', ['$http', '$scope', '$rootScope', '$sce', function ($http, $scope, $rootScope, $sce) {
+    app.controller('categoryController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', function ($http, $scope, $rootScope, $sce, appConfig) {
 
         $rootScope.title = "";
         $scope.ads = [];
         $scope.category = "";
+<<<<<<< HEAD
+        $scope.API = appConfig.municloudapiEndPoint; // 'http://munipoiapp.herokuapp.com/api/';
+=======
         $scope.API = appConfig.municloudapiEndPoint;// 'http://munipoiapp.herokuapp.com/api/';
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
 
 
         // true is to show ALL locations, false to show ONLY closests locations
@@ -1680,13 +1689,12 @@
 
     }]);
 
-    app.controller('poiController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    app.controller('poiController', ['$scope', '$rootScope', '$sce', '$http', 'loadingMessageService', 'appConfig', function ($scope, $rootScope, $sce, $http, loadingMessageService, appConfig) {
 
         $scope.locations = [];
         $scope.locationsType = 'map';
         $scope.userLat = 0;
         $scope.userLng = 0;
-
 
         $scope.init = function initMap(poiType) {
 
@@ -1703,9 +1711,15 @@
                 var radius = appNavigator.getCurrentPage().options.radius;
 
                 if (poiType == 'All')
+<<<<<<< HEAD
+                    $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                else
+                    $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+=======
                     $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
                 else
                     $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
 
                 $http.get($scope.API).success(function (response) {
 
@@ -1786,7 +1800,6 @@
             }
 
         }
-
 
         $scope.loadPOI = function (poiType) {
 
@@ -2001,7 +2014,7 @@
 
     }]);
 
-    app.controller('profileController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    app.controller('profileController', ['$scope', '$rootScope', '$sce', '$http', 'appConfig', function ($scope, $rootScope, $sce, $http, appConfig) {
 
         var page = appNavigator.getCurrentPage();
         var id = page.options.id;
@@ -2026,7 +2039,11 @@
 
         $scope.pullMeterContent = function () {
 
+<<<<<<< HEAD
+            $scope.API = appConfig.emmmetersapiEndPoint; // "http://196.15.242.146:5555/rest/EMMSuprema/resources/getMeterDetails/64010";
+=======
             $scope.API = appConfig.emmmetersapiEndPoint;// "http://196.15.242.146:5555/rest/EMMSuprema/resources/getMeterDetails/64010";
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
 
             window.localStorage.setItem("meternumber", "64010");
 
@@ -2224,12 +2241,11 @@
 
             appNavigator.pushPage('casehistory.html');
 
-
         }
 
     }]);
 
-    app.controller('statsController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    app.controller('statsController', ['$scope', '$rootScope', '$sce', '$http', 'appConfig', function ($scope, $rootScope, $sce, $http, appConfig) {
 
         $scope.options = {
 
@@ -2850,12 +2866,74 @@
         }
 
     }]);
+    
+    app.controller('supremaController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig','loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+        
+         $scope.suprema = {}
+         
+         $scope.tarrifTypeList = [
+             
+             {"id":1,"name":"Tariff A"},
+             {"id":2,"name":"Tariff B"},
+         ];
+          $scope.meterStatusList = [
+             
+             {"id":1,"name":"Blocked"},
+             {"id":2,"name":"UnBlocked"},
+         ];
+         
+         $scope.getMeterRegistration = function () {
+             
+            $scope.API = appConfig.emmsupremaEndPoint;
+
+            if (typeof $scope.suprema.tarrifType === 'undefined' && typeof $scope.suprema.startdate === 'undefined' && typeof $scope.suprema.enddate === 'undefined' && typeof $scope.suprema.meterstatus === 'undefined') {
+
+                ons.notification.alert({
+                    message: 'This input form not complete!',
+                    modifier: 'material'
+                });
 
 
-    app.controller('logCallsController', ['$http', '$scope', '$rootScope', '$sce', function ($http, $scope, $rootScope, $sce) {
+            } else {
 
-        $scope.numOfCalls = 0; //JSON.parse(localStorage.getItem('appLocalStorageUser'));
+                $scope.isFetching = true;
+                $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+                modal.show();
 
+<<<<<<< HEAD
+                $scope.API = $scope.API + '{"tarrifType":"' + $scope.suprema.tarrifType + '","startDate":"' + $scope.suprema.startdate + '","endDate":"' + $scope.suprema.enddate + '","meterstatus":"' + $scope.suprema.meterstatus + '"}';
+
+                $http.get($scope.API).success(function (data) {
+                    
+                    $scope.meters = data.getTarrif;
+
+                    $scope.isFetching = false;
+                    modal.hide();
+
+                }).error(function (data, status, headers, config) {
+                    
+                    $scope.isFetching = false;
+                    modal.hide();
+
+                    ons.notification.alert({
+                        message: JSON.stringify(data),
+                        modifier: 'material'
+                    });
+
+                    console.debug("error", status);
+                });
+
+            }
+        };
+         
+     }]);
+
+    app.controller('logCallsController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', function ($http, $scope, $rootScope, $sce, appConfig) {
+
+        $scope.numOfCalls = 0;
+
+=======
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
         $scope.API = appConfig.emmcreateincidentapiEndPoint;
 
         $scope.list = [{
@@ -2961,6 +3039,22 @@
         };
 
 }]);
+
+    app.controller('speachSearchController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+
+        function recognizeSpeech() {
+                var maxMatches = 5;
+                var promptString = "Speak now"; // optional
+                var language = "en-US";                     // optional
+                window.plugins.speechrecognizer.startRecognize(function(result){
+                    alert(result);
+                    $scope.recognizedText = result;
+                }, function(errorMessage){
+                    console.log("Error message: " + errorMessage);
+                }, maxMatches, promptString, language);
+            }
+
+    }]);
 
     app.controller('talkToCounsellorController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
 
