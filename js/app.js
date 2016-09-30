@@ -2856,7 +2856,6 @@
              {"id":1,"name":"Tariff A"},
              {"id":2,"name":"Tariff B"},
          ];
-         
           $scope.meterStatusList = [
              
              {"id":1,"name":"Blocked"},
