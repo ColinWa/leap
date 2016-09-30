@@ -1375,9 +1375,15 @@
             });
 
         }
+<<<<<<< HEAD
 
         $scope.getDirections = function (lat, lot) {
 
+=======
+       
+       $scope.getDirections = function (lat,lot) {
+           
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
             var link = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&daddr=" + lat + "," + lot;
             console.log(link);
 
@@ -1498,7 +1504,11 @@
         $rootScope.title = "";
         $scope.ads = [];
         $scope.category = "";
+<<<<<<< HEAD
         $scope.API = appConfig.municloudapiEndPoint; // 'http://munipoiapp.herokuapp.com/api/';
+=======
+        $scope.API = appConfig.municloudapiEndPoint;// 'http://munipoiapp.herokuapp.com/api/';
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
 
 
         // true is to show ALL locations, false to show ONLY closests locations
@@ -1701,9 +1711,15 @@
                 var radius = appNavigator.getCurrentPage().options.radius;
 
                 if (poiType == 'All')
+<<<<<<< HEAD
                     $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
                 else
                     $scope.API = appConfig.nearbysearchapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+=======
+                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=25000&type=point_of_interest&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+                else
+                    $scope.API = appConfig.googledirectionapiEndPoint + $scope.userLat + "," + $scope.userLng + "&radius=10000&type=" + poiType + "&key=AIzaSyD8Or6tO3h801EW-QtIDI_VG-93B5OnoIM";
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
 
                 $http.get($scope.API).success(function (response) {
 
@@ -2023,7 +2039,11 @@
 
         $scope.pullMeterContent = function () {
 
+<<<<<<< HEAD
             $scope.API = appConfig.emmmetersapiEndPoint; // "http://196.15.242.146:5555/rest/EMMSuprema/resources/getMeterDetails/64010";
+=======
+            $scope.API = appConfig.emmmetersapiEndPoint;// "http://196.15.242.146:5555/rest/EMMSuprema/resources/getMeterDetails/64010";
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
 
             window.localStorage.setItem("meternumber", "64010");
 
@@ -2880,6 +2900,7 @@
                 $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
                 modal.show();
 
+<<<<<<< HEAD
                 $scope.API = $scope.API + '{"tarrifType":"' + $scope.suprema.tarrifType + '","startDate":"' + $scope.suprema.startdate + '","endDate":"' + $scope.suprema.enddate + '","meterstatus":"' + $scope.suprema.meterstatus + '"}';
 
                 $http.get($scope.API).success(function (data) {
@@ -2911,6 +2932,8 @@
 
         $scope.numOfCalls = 0;
 
+=======
+>>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
         $scope.API = appConfig.emmcreateincidentapiEndPoint;
 
         $scope.list = [{
