@@ -3,10 +3,6 @@
 app
 .constant('appConfig', {
   municloudapiEndPoint: 'http://munipoiapp.herokuapp.com/api/',
-<<<<<<< HEAD
-=======
- 
->>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
   nearbysearchapiEndPoint : 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=',
   poiapiEndPoint : 'http://munipoiapp.herokuapp.com/api/pois',
   googledirectionapiEndPoint : 'http://maps.google.com/maps?saddr=',
@@ -22,15 +18,10 @@ app
   emmloginapiEndPoint : 'http://196.15.242.146:5555/rest/EMMPerson/resources/customerLogIn/{',
   emmpasswordrecoveryapiEndPoint : 'http://196.15.242.146:5555/rest/EMMPerson/resources/recoverPassword/{',
   emmretrievecomplaintapiEndPoint : 'http://196.15.242.146:5555/rest/EMMMobiApp/resource/retrieveComplaint',
-<<<<<<< HEAD
   emmsupremaEndPoint : 'http://196.15.242.146:5555/rest/EMMSuprema/resources/getPrepaidVending/',
     
   notificationapiEndPoint : 'https://onesignal.com/api/v1/notifications'
 
-=======
-    
-  notificationapiEndPoint : 'https://onesignal.com/api/v1/notifications'
->>>>>>> 588463fc865183f0d82a122888cc258cc7ec7308
   
 })
 .value('curSymbol', {
