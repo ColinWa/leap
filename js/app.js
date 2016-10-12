@@ -22,6 +22,8 @@
     app.controller('networkController', function ($scope, $q, $rootScope) {
 
         document.addEventListener('deviceready', function () {
+            
+            navigator.splashscreen.hide();
 
             OAuth.initialize('cxhwciIvEZEjw2e5pVe8ucOB6H8')
 
@@ -319,9 +321,9 @@
         $scope.API = appConfig.municloudapiEndPoint; //'http://munipoiapp.herokuapp.com/api/';
 
         if ($rootScope.searchOptions == true)
-            $scope.API = $scope.API + 'pois?artcentres=' + $rootScope.artcentre + '&schools=' + $rootScope.schools + '&votingstations=' + $rootScope.votingstations + '&parks=' + $rootScope.parks;
+            $scope.API = $scope.API + 'pois?artcentres=' + $rootScope.artcentre + '&schools=' + $rootScope.schools + '&votingstations=' + $rootScope.votingstations + '&parks=' + $rootScope.parks + '&clinics=' + $rootScope.clinics;
         else
-            $scope.API = $scope.API + 'pois?artcentres=true&schools=true&votingstations=true&parks=true';
+            $scope.API = $scope.API + 'pois?artcentres=true&schools=true&votingstations=true&parks=true&clinics=true';
 
         $rootScope.searchOptions = false;
         $scope.viewsettings = 0;
@@ -739,7 +741,7 @@
 
         $scope.pullMarkersContent = function () {
 
-            $scope.API = appConfig.poiapiEndPoint; //"http://munipoiapp.herokuapp.com/api/pois";
+            $scope.API = appConfig.poiapiEndPoint; 
 
             $scope.API = $scope.API + '?' + $rootScope.optionselected + '=true'
 
@@ -1094,6 +1096,9 @@
             },
             police: {
                 icon: '/images/icons/police.png'
+            },
+            clinics: {
+                icon: '/images/icons/clinics.png'
             }
         };
 
@@ -1186,8 +1191,6 @@
 
             if (type == "poi")
                 $scope.loadPOIMarkers();
-            else if (type == "clinics")
-                $scope.loadClinicsMarkers();
             else
                 $scope.loadMarkers(type);
 
@@ -1570,6 +1573,9 @@
             case 'police':
                 $rootScope.optionselected = 'police';
                 break;
+            case 'clinics':
+                $rootScope.optionselected = 'clinics';
+                break;
             default:
             }
 
@@ -1601,6 +1607,9 @@
                 break;
             case 'ccc':
                 $rootScope.optionselected = 'ccc';
+                break;
+            case 'clinics':
+                $rootScope.optionselected = 'clinics';
                 break;
             default:
             }
@@ -1641,6 +1650,9 @@
                 break;
             case 'police':
                 $rootScope.optionselected = 'police';
+                break;
+            case 'clinics':
+                $rootScope.optionselected = 'clinics';
                 break;
             default:
             }
