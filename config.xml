@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
     <!-- config.xml reference: https://build.phonegap.com/docs/config-xml -->
-    <widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.leap" versionCode="1344" version="0.0.9">
+    <widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.leap" versionCode="1345" version="0.1.0">
 
         <name>LEAP</name>
 
@@ -23,6 +23,10 @@
         <feature name="http://api.phonegap.com/1.0/geolocation" />
 
         <preference name="permissions" value="INTERNET" />
+        
+        <preference name="AutoHideSplashScreen" value="false" />
+
+        <preference name="SplashScreenDelay" value="10000"/>
 
         <!-- Customize your app and platform with the preference element. -->
         <preference name="orientation" value="default" />
@@ -43,20 +47,16 @@
         <!-- ios: if set to true, app will terminate when home button is pressed -->
         <preference name="show-splash-screen-spinner" value="true" />
         <!-- ios: if set to false, the spinner won't appear on the splash screen during app loading -->
-        <preference name="auto-hide-splash-screen" value="true" />
+        <preference name="auto-hide-splash-screen" value="false" />
         <!-- ios: if set to false, the splash screen must be hidden using a JavaScript API -->
         <preference name="disable-cursor" value="false" />
         <!-- blackberry: prevents a mouse-icon/cursor from being displayed on the app -->
         <preference name="android-installLocation" value="auto" />
         <!-- all: possible values handset, tablet, or universal -->
         <preference name="fullscreen" value="false" />
-        
-            
-        
+
 <!--        Define a specific version of PhoneGap to build into your app.-->
         <preference name="phonegap-version" value="cli-6.3.0" />
-    
-
         <preference name="android-build-tool" value="gradle" />
 
         <!-- Plugins -->
@@ -82,7 +82,7 @@
         <gap:plugin name="org.apache.cordova.splashscreen" />
         <gap:plugin name="org.apache.cordova.vibration" />
         <gap:plugin name="onesignal-cordova-plugin" source="npm" />
-        <gap:plugin name="com.aserputko.speech.speechrecognition" spec="0.0.1" source="pgb" />
+        
 
 
         <!-- Third party plugins -->

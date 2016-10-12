@@ -2,9 +2,9 @@
     <ons-page ng-controller="branchesController" ng-init="checkIfLoggedIn()">
         <ons-toolbar fixed-style>
            <div class="left">
-                <ons-toolbar-button ng-click="appNavigator.pushPage('voice-search.html')">
+                <!--<ons-toolbar-button ng-click="appNavigator.pushPage('voice-search.html')">
                     <ons-icon icon="ion-speakerphone" fixed-width="false"></ons-icon>
-                </ons-toolbar-button>
+                </ons-toolbar-button>-->
             </div>
             <div class="center"><img src="icon.png" height="45"/></div>
         
@@ -29,6 +29,16 @@
                         </ons-button>
                     </ons-col>
                 </ons-row>
+                
+                <ons-row>
+                    <ons-col>
+                        <ons-button modifier="clean" ng-click="appNavigator.pushPage('category.html',{category: 'clinics', categoryTitle: 'Clinics'});">
+                            <img src="images/menu/clinics.png">
+                            <p>Clinics</p>
+                        </ons-button>
+                    </ons-col>
+                </ons-row>
+                
                 <ons-row>
                     <ons-col>
                         <ons-button modifier="clean" ng-click="appNavigator.pushPage('category.html',{category: 'schools', categoryTitle: 'Schools'});">
@@ -37,6 +47,7 @@
                         </ons-button>
                     </ons-col>
                 </ons-row>
+                
                 <ons-row>
                     <ons-col>
                         <ons-button modifier="clean" ng-click="appNavigator.pushPage('category.html',{category: 'artcentres', categoryTitle: 'Art Centres'});">
