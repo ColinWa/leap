@@ -4,6 +4,7 @@
 
     var app = angular.module('app', ['onsen', 'angular-images-loaded', 'ngMap', 'nvd3', 'ngMessages']);
 
+    var datePicker;
 
     // Filter to convert HTML content to string by removing all HTML tags
     app.filter('htmlToPlaintext', function () {
@@ -22,8 +23,10 @@
     app.controller('networkController', function ($scope, $q, $rootScope) {
 
         document.addEventListener('deviceready', function () {
-            
+
             navigator.splashscreen.hide();
+
+            datePicker = window.plugins.datePicker;
 
             OAuth.initialize('cxhwciIvEZEjw2e5pVe8ucOB6H8')
 
@@ -741,7 +744,7 @@
 
         $scope.pullMarkersContent = function () {
 
-            $scope.API = appConfig.poiapiEndPoint; 
+            $scope.API = appConfig.poiapiEndPoint;
 
             $scope.API = $scope.API + '?' + $rootScope.optionselected + '=true'
 
@@ -1073,6 +1076,890 @@
         });
 
     });
+
+    app.controller('goodsReturnedNotesController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+
+        $scope.goodsReturned = {}
+
+        $scope.returnedNotesList = [];
+
+        $scope.getGoodsReturnedNotes = function () {
+            $scope.API = appConfig.emmtransactionaleventsEndPoint;
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+            $scope.API = $scope.API + '{"serviceProperties":{"systemCode":"code","key":"key"},"serviceRequest"{"searchType":"details","transactionalEventsType":"goodsReturnedNotes"}}';
+            console.log($scope.API);
+            $http.get($scope.API).success(function (data) {
+                $scope.returnedNotesList = data.rows.rows;
+
+                $scope.isFetching = false;
+                modal.hide();
+            }).error(function (data, status, headers, config) {
+                $scope.isFetching = false;
+                modal.hide();
+                ons.notification.alert({
+                    message: JSON.stringify('Something went wrong'),
+                    modifier: 'material'
+                });
+            });
+
+        };
+    }]);
+
+    app.controller('vehicleController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+
+        $scope.vehicle = {}
+
+        $scope.vehicleList = []
+
+        $scope.getStartDate = function () {
+
+            var startDate;
+
+            var options = {
+                date: new Date(),
+                mode: 'date'
+            }
+
+            datePicker.show(options, function (date) {
+
+                $scope.vehicle.startDate = date;
+                $scope.$apply();
+
+            })
+
+        };
+
+        $scope.getEndDate = function () {
+
+            var options = {
+                date: new Date(),
+                mode: 'date'
+            }
+
+            datePicker.show(options, function (date) {
+
+                $scope.vehicle.endDate = date;
+                $scope.$apply();
+
+            })
+
+        };
+
+        $scope.getVehicleRegistration = function () {
+
+            $scope.API = appConfig.emmlocationEndPoint;
+
+            if (typeof $scope.vehicle.startDate === 'undefined' && typeof $scope.vehicle.endDate === 'undefined') {
+
+                ons.notification.alert({
+                    message: 'This input form not complete!',
+                    modifier: 'material'
+                });
+
+
+            } else {
+
+                $scope.isFetching = true;
+                $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+                modal.show();
+
+
+                var month = $scope.vehicle.startDate.getMonth();
+
+                var day = $scope.vehicle.startDate.getDate();
+
+                var year = $scope.vehicle.startDate.getFullYear();
+
+                //
+
+                var endmonth = $scope.vehicle.endDate.getMonth();
+
+                var endday = $scope.vehicle.endDate.getDate();
+
+                var endyear = $scope.vehicle.endDate.getFullYear();
+
+                $scope.API = $scope.API + '{"serviceRequest":{"searchCriteria":[{"name": "startDate","value":"' + year + "-" + month + "-" + day + '"},{"name":"endDate","value":"' + endyear + "-" + endmonth + "-" + endday + '"}],"locationType":"vehicles"}}';
+
+                console.log($scope.API);
+
+                $http.get($scope.API).success(function (data) {
+
+                    $scope.vehicleList = data.rows;
+
+                    $scope.isFetching = false;
+                    modal.hide();
+
+                }).error(function (data, status, headers, config) {
+
+                    $scope.isFetching = false;
+                    modal.hide();
+
+                    ons.notification.alert({
+                        message: JSON.stringify('Please specify a different date range'),
+                        modifier: 'material'
+                    });
+
+                });
+
+            }
+        };
+
+        $scope.loadVehicleDetails = function (index, vehicle) {
+
+            appNavigator.pushPage('vehicledetails.html', {
+                fleetno: vehicle.FLEET_NO
+            });
+
+        };
+
+        $scope.showVehicleDetails = function () {
+
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            var fleetno = appNavigator.getCurrentPage().options.fleetno;
+
+            $scope.API = appConfig.emmfleetEndPoint;
+
+            $scope.API = $scope.API + '{"fleetNumber":"' + fleetno + '"}';
+
+            console.log($scope.API);
+
+            $http.get($scope.API).success(function (data) {
+
+                    if (data.vehiclePositioning.length > 0)
+                        $scope.result = data.vehiclePositioning[0];
+                    else
+                        ons.notification.alert({
+                            message: 'Fleet Number not found!',
+                            modifier: 'material'
+                        });
+
+                    $scope.isFetching = false;
+                    modal.hide();
+
+                },
+                function (error) {
+
+                    console.log("Couldn't get the location details.");
+
+                    ons.notification.alert({
+                        message: 'Something wrong with your connection.!',
+                        modifier: 'material'
+                    });
+
+                    modal.hide();
+
+                    console.log(error.code);
+
+                });
+
+        }
+
+    }]);
+
+    app.controller('employeeController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+
+        $scope.employee = {}
+
+        $scope.employeeList = [];
+
+        var femalecount = 0,
+            malecount = 0,
+            minyearfemale = 0,
+            minyearmale = 0;
+
+        $scope.getEmployee = function () {
+
+            $scope.API = appConfig.emmemployeeEndPoint;
+
+            if (typeof $scope.employee.startDate === 'undefined' && typeof $scope.employee.endDate === 'undefined') {
+                ons.notification.alert({
+                    message: 'This input form not complete!',
+                    modifier: 'material'
+                });
+            } else {
+                $scope.isFetching = true;
+                $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+                modal.show();
+
+                var month = $scope.employee.startDate.getMonth();
+                var day = $scope.employee.startDate.getDate();
+                var year = $scope.employee.startDate.getFullYear();
+                var endmonth = $scope.employee.endDate.getMonth();
+                var endday = $scope.employee.endDate.getDate();
+                var endyear = $scope.employee.endDate.getFullYear();
+
+                $scope.API = $scope.API + '{"serviceProperties":{"systemCode":"code","key":"key"},"serviceRequest":{"searchCriteria":[{"name":"startDate","value":"' + year + "-" + month + "-" + day + '"},{"name":"endDate","value":"' + endyear + "-" + endmonth + "-" + endday + '"}],"searchType":"date","personType":"employees"}}';
+
+                $http.get($scope.API).success(function (data) {
+
+                    if (!angular.isUndefined(data.rows[0].employeeFLEETDataDocument)) {
+
+                        $scope.employeeList = data.rows[0].employeeFLEETDataDocument;
+
+                        minyearfemale = $scope.employeeList[0].DATE_OF_BIRTH.substring(6);
+                        minyearmale = $scope.employeeList[0].DATE_OF_BIRTH.substring(6);
+
+                        angular.forEach($scope.employeeList, function (value, key) {
+                            if (value.GENDER === "F") {
+                                femalecount++;
+
+                                if (value.DATE_OF_BIRTH.substring(6) < minyearfemale)
+                                    minyearfemale = value.DATE_OF_BIRTH.substring(6);
+
+                            } else {
+                                malecount++;
+
+                                if (value.DATE_OF_BIRTH.substring(6) < minyearmale)
+                                    minyearmale = value.DATE_OF_BIRTH.substring(6);
+                            }
+
+
+                        });
+
+                    }
+
+                    $scope.isFetching = false;
+                    modal.hide();
+                }).error(function (data, status, headers, config) {
+                    $scope.isFetching = false;
+                    modal.hide();
+                    ons.notification.alert({
+                        message: JSON.stringify(data),
+                        modifier: 'material'
+                    });
+                    console.debug("error", status);
+                });
+            }
+        };
+
+        $scope.showStats = function () {
+
+            appNavigator.pushPage('employeestats.html', {
+                minyearfemale: minyearfemale,
+                minyearmale: minyearmale,
+                femalecount: femalecount,
+                malecount: malecount
+            });
+
+        };
+
+        $scope.getEmployeeStartDate = function () {
+
+            var startDate;
+
+            var options = {
+                date: new Date(),
+                mode: 'date'
+            }
+
+            datePicker.show(options, function (date) {
+
+                $scope.employee.startDate = date;
+                $scope.$apply();
+
+            })
+
+        };
+
+        $scope.getEmployeeEndDate = function () {
+
+            var endDate;
+
+            var options = {
+                date: new Date(),
+                mode: 'date'
+            }
+
+            datePicker.show(options, function (date) {
+
+                $scope.employee.endDate = date;
+                $scope.$apply();
+
+            })
+
+        };
+
+        $scope.loadEmployeeDetails = function (index, vehicle) {
+            appNavigator.pushPage('employeedetails.html', {
+                employees: employee.EMPLOYEE_NO
+            });
+        };
+
+        $scope.showEmployeeDetails = function () {
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+            var employeeno = appNavigator.getCurrentPage().options.employeeno;
+            $scope.API = appConfig.emmemployeeEndPoint;
+
+            $http.get($scope.API).success(function (response) {
+                    $scope.employees = data.getEmployees;
+                    modal.hide();
+                },
+                function (error) {
+                    console.log("Couldn't get the location details.");
+                    ons.notification.alert({
+                        message: 'Something wrong with your connection.!',
+                        modifier: 'material'
+                    });
+                    modal.hide();
+                    console.log(error.code);
+                    $rootScope.goExit();
+                }, {
+                    maximumAge: Infinity,
+                    timeout: 60000,
+                    enableHighAccuracy: true
+                });
+        }
+
+        // Show latest stats
+        $scope.showEmployeeStats = function () {
+
+            $scope.options = {
+
+                chart: {
+
+                    type: 'pieChart',
+
+                    height: 500,
+
+                    x: function (d) {
+                        return d.Name;
+                    },
+
+                    y: function (d) {
+
+                        return d.PercOfEmployee;
+                    },
+
+                    showLabels: true,
+                    showLegend: true,
+
+                    duration: 500,
+
+                    labelThreshold: 0.01,
+
+                    labelSunbeamLayout: true,
+
+                    valueFormat: function (d) {
+
+                        return d3.format(',.0f')(d) + ' ' + $scope.graphtitle;
+
+                    },
+
+                    legend: {
+
+                        margin: {
+
+                            top: 5,
+
+                            right: 35,
+
+                            bottom: 5,
+
+                            left: 0
+
+                        }
+
+                    },
+
+                    "title": {
+
+                        "enable": true,
+
+                        "text": "Latest Stats"
+
+                    },
+
+                    "subtitle": {
+
+                        "enable": true,
+
+                        "text": "This information was provided by the eFleet",
+
+                        "css": {
+
+                            "text-align": "right",
+
+                            "margin": "10px 13px 0px 7px"
+
+                        }
+
+                    },
+
+                    caption: {
+
+                        enable: true,
+
+                        html: 'Click on the legend to show/hide',
+
+                        css: {
+
+                            'text-align': 'justify',
+
+                            'margin': '10px 13px 0px 7px'
+
+                        }
+
+                    }
+
+                }
+
+            };
+
+            var page = appNavigator.getCurrentPage();
+            $scope.minyearfemale = page.options.minyearfemale;
+            $scope.minyearmale = page.options.minyearmale;
+            $scope.femalecount = page.options.femalecount;
+            $scope.malecount = page.options.malecount;
+            $scope.graphtitle = "Employees";
+
+            $scope.data = [{
+                    Name: 'Male',
+                    PercOfEmployee: $scope.malecount
+                                      },
+                {
+                    Name: 'Female',
+                    PercOfEmployee: $scope.femalecount
+                                      }
+                                    ];
+
+        };
+
+
+    }]);
+
+    app.controller('purchaseOrderController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+
+        $scope.purchaseOrderDetails = {}
+        $scope.isShowing = false;
+
+        $scope.getPurchaseOrder = function () {
+
+            $scope.API = appConfig.emmpurchaseorderEndPoint;
+
+            if (typeof $scope.purchaseorder.ordernumber === 'undefined') {
+
+                ons.notification.alert({
+                    message: 'This input form not complete!',
+                    modifier: 'material'
+                });
+
+
+            } else {
+
+                $scope.isFetching = true;
+                $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+                modal.show();
+
+                $scope.API = $scope.API + '{"purcahseOrder":{"orderNumber":"' + $scope.purchaseorder.ordernumber + '"}}';
+
+                console.log($scope.API);
+
+                $http.get($scope.API).success(function (data) {
+
+                    $scope.purchaseOrderDetails = data.purchaseOrderDeatils;
+
+                    if (!angular.isUndefined($scope.purchaseOrderDetails))
+                        $scope.isShowing = true;
+
+                    $scope.isFetching = false;
+                    modal.hide();
+
+                }).error(function (data, status, headers, config) {
+
+                    $scope.isFetching = false;
+                    modal.hide();
+
+                    ons.notification.alert({
+                        message: JSON.stringify('Something went wrong'),
+                        modifier: 'material'
+                    });
+
+                });
+
+            }
+        };
+
+
+    }]);
+
+    app.controller('indigentController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+
+        $scope.aggregatedList = [];
+
+        $scope.initIndigent = function () {
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            d3.json(appConfig.emmIdigentEndPoint, function (data) {
+
+                //UnEmployed
+                var unemployedList = {
+                    key: "UnEmployed",
+                    color: "#4f99b4",
+                    values: []
+                };
+
+                var i;
+                $scope.unEmployedHighValue = 0, $scope.employedHighValue = 0, $scope.childHeadedHighValue = 0;
+                $scope.unEmployedHighWard = "", $scope.employedHighWard = "", $scope.childHeadedHighWard = "";
+
+                for (i = 0; i < data.length; i++) {
+
+                    if (parseInt(data[i].unemployed, 10) > $scope.unEmployedHighValue) {
+                        $scope.unEmployedHighValue = data[i].unemployed;
+                        $scope.unEmployedHighWard = data[i].a_wardNo;
+                    }
+
+                    unemployedList.values.push({
+                        value: data[i].unemployed,
+                        label: data[i].a_wardNo
+                    });
+
+                };
+
+                //Employees
+                var employedList = {
+                    key: "Employed",
+                    color: "#4d4cb9",
+                    values: []
+                };
+
+                var i;
+
+                for (i = 0; i < data.length; i++) {
+
+                    if (parseInt(data[i].employed, 10) > $scope.employedHighValue) {
+                        $scope.employedHighValue = data[i].employed;
+                        $scope.employedHighWard = data[i].a_wardNo;
+                    }
+
+                    employedList.values.push({
+                        value: data[i].employed,
+                        label: data[i].a_wardNo
+                    });
+
+                };
+
+                var childHeadedList = {
+                    key: "ChildHeaded",
+                    color: "#00FF00",
+                    values: []
+                };
+                var i;
+
+
+                for (i = 0; i < data.length; i++) {
+
+                    if (parseInt(data[i].childHeaded, 10) > $scope.childHeadedHighValue) {
+                        $scope.childHeadedHighValue = data[i].childHeaded;
+                        $scope.childHeadedHighWard = data[i].a_wardNo;
+                    }
+
+                    childHeadedList.values.push({
+                        value: data[i].childHeaded,
+                        label: data[i].a_wardNo
+                    });
+
+                };
+
+                $scope.aggregatedList = [unemployedList, employedList, childHeadedList];
+
+                $scope.$apply();
+
+
+                nv.addGraph(function () {
+
+                    var chart = nv.models.multiBarHorizontalChart()
+                        .x(function (d) {
+                            return "Ward " + d.label
+                        })
+                        .y(function (d) {
+                            return d.value
+                        })
+                        .margin({
+                            top: 55,
+                            right: 5,
+                            bottom: 5,
+                            left: 55
+                        })
+                        .showValues(true) //Show bar value next to each bar.
+                        //.tooltips(true) //Show tooltips on hover.
+                        //.transitionDuration(350)
+                        .showControls(false); //Allow user to switch between "Grouped" and "Stacked" mode.
+
+                    chart.yAxis
+                        .tickFormat(d3.format(',.2f'));
+                    chart.groupSpacing(0);
+                    chart.height(1600);
+
+                    d3.select('#chart1 svg')
+                        .datum($scope.aggregatedList)
+                        .call(chart);
+
+                    nv.utils.windowResize(chart.update);
+
+                    return chart;
+                });
+
+                $scope.isFetching = false;
+                modal.hide();
+            });
+
+        }
+
+    }]);
+
+    app.controller('hrController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+
+        $scope.aggregatedList = [];
+        $scope.markers = [];
+        $scope.employeeList = [];
+
+        $scope.initHRInfo = function () {
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+
+            d3.json(appConfig.emmHRinfoEndPoint, function (data) {
+                
+                $scope.employeeList = data.results;
+
+                //Female
+                var femaleList = {
+                    key: "Female",
+                    color: "#4f99b4",
+                    values: []
+                };
+
+                var i;
+                var count;
+                for (i = 0; i < data.results.length; i++) {
+
+                    var count = data.results.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == data.results[i].TOWN_OR_CITY && person.SEX == 'F');
+                    }, 0);
+
+                    femaleList.values.push({
+                        value: count,
+                        label: data.results[i].TOWN_OR_CITY
+                    });
+                }
+
+                //Male
+                var maleList = {
+                    key: "Male",
+                    color: "#00FF00",
+                    values: []
+                };
+
+                var i;
+                var count;
+                for (i = 0; i < data.results.length; i++) {
+
+                    var count = data.results.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == data.results[i].TOWN_OR_CITY && person.SEX == 'M');
+                    }, 0);
+
+                    maleList.values.push({
+                        value: count,
+                        label: data.results[i].TOWN_OR_CITY
+                    });
+                }
+
+                $scope.maleHighValue = 0, $scope.femaleHighValue = 0;
+                $scope.maleHighRegion = "", $scope.femaleHighRegion = "";
+
+                for (i = 0; i < maleList.values.length; i++) {
+
+                    if (parseInt(maleList.values[i].value, 10) > $scope.maleHighValue) {
+                        $scope.maleHighValue = maleList.values[i].value;
+                        $scope.maleHighRegion = maleList.values[i].label;
+                    }
+
+                };
+
+                for (i = 0; i < femaleList.values.length; i++) {
+
+                    if (parseInt(femaleList.values[i].value, 10) > $scope.femaleHighValue) {
+                        $scope.femaleHighValue = femaleList.values[i].value;
+                        $scope.femaleHighRegion = femaleList.values[i].label;
+                    }
+
+                };
+
+                $scope.aggregatedList = [femaleList, maleList];
+
+                $scope.$apply();
+
+
+                nv.addGraph(function () {
+
+                    var chart = nv.models.multiBarHorizontalChart()
+                        .x(function (d) {
+                            return d.label
+                        })
+                        .y(function (d) {
+                            return d.value
+                        })
+                        .margin({
+                            top: 55,
+                            right: 5,
+                            bottom: 5,
+                            left: 65
+                        })
+                        .showValues(true) //Show bar value next to each bar.
+                        //.tooltips(true) //Show tooltips on hover.
+                        //.transitionDuration(350)
+                        .showControls(false); //Allow user to switch between "Grouped" and "Stacked" mode.
+
+                    chart.yAxis
+                        .tickFormat(d3.format(',.2f'));
+                    chart.groupSpacing(0);
+                    chart.height(900);
+
+                    d3.select('#chart1 svg')
+                        .datum($scope.aggregatedList)
+                        .call(chart);
+
+                    nv.utils.windowResize(chart.update);
+
+                    return chart;
+                });
+
+                $scope.isFetching = false;
+                modal.hide();
+            });
+
+        }
+
+        $scope.pullMarkersContent = function () {
+
+            navigator.geolocation.getCurrentPosition(function (position) {
+
+                $scope.userLat = position.coords.latitude;
+                $scope.userLng = position.coords.longitude;
+
+                $http.get('regions.json').success(function (response) {
+
+                    $scope.locations = response.regions;
+
+                    $.each($scope.locations, function (index, value) {
+
+                        var distance = Haversine($scope.locations[index].geometry.location.lat, $scope.locations[index].geometry.location.lng, $scope.userLat, $scope.userLng);
+
+                        $scope.markers.push({
+                            'id': index,
+                            'title': $scope.locations[index].section,
+                            'content': $scope.locations[index].section,
+
+                            'distance': (Math.round(distance * 100) / 100),
+                            'location': [$scope.locations[index].geometry.location.lat, $scope.locations[index].geometry.location.lng],
+                            'type': $scope.locations[index].type,
+                            'icon': "images/icons/mapicon.png"
+
+                        });
+
+                    });
+
+                });
+                
+                 
+            d3.json(appConfig.emmHRinfoEndPoint, function (data) {
+                
+                $scope.employeeList = data.results;
+            });
+
+            }, function (error) {
+
+                console.log("Couldn't get the location of the user.");
+
+                ons.notification.alert({
+                    message: 'Please enable you GPS and try again.!',
+                    modifier: 'material'
+                });
+
+                modal.hide();
+
+                console.log(error.code);
+
+                $rootScope.goExit();
+
+            }, {
+                maximumAge: Infinity,
+                timeout: 60000,
+                enableHighAccuracy: true
+            });
+
+        }
+
+
+        $scope.showMarker = function (event) {
+
+            $scope.marker = $scope.markers[this.id];
+            
+            var count = $scope.employeeList.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == $scope.marker.title);
+                    }, 0);
+            
+            var femalecount = $scope.employeeList.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.SEX == 'F');
+                    }, 0);
+            
+            var malecount = $scope.employeeList.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.SEX == 'M');
+                    }, 0);
+            
+            var Over50count = $scope.employeeList.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'Over50');
+                    }, 0);
+            
+            var LessThan45count = $scope.employeeList.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan45');
+                    }, 0);
+            
+            var LessThan40count = $scope.employeeList.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan40');
+                    }, 0);
+            
+            var LessThan35count = $scope.employeeList.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan35');
+                    }, 0);
+            
+            var LessThan30count = $scope.employeeList.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan30');
+                    }, 0);
+            
+            var LessThan25count = $scope.employeeList.reduce(function (n, person) {
+                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan25');
+                    }, 0);
+            
+            $scope.infoWindow = {
+                id: $scope.marker.id,
+
+                title: $scope.marker.title,
+                content: 'There are ' + count + ' employees, ' + femalecount + ' females and ' + malecount + ' males. <br><br> Age Group<br> 1. ' + Over50count + ' over 50 years. <br> 2. ' + LessThan45count + ' over 45 and less than 50 years. <br> 3. ' + LessThan40count + ' over 35 and less than 45 years. <br> 4. ' + LessThan35count + ' over 30 and less than 35 years. <br>5. ' + LessThan30count + ' over 25 and less than 30 years. <br>6. ' + LessThan25count + '  less than 25 years.',
+
+                distance: $scope.marker.distance,
+                location: $scope.marker.location,
+
+            };
+            $scope.$apply();
+            $scope.showInfoWindow(event, 'marker-info', this.getPosition());
+
+        }
+
+        }]);
+
 
     app.controller('mapController', ['$http', '$scope', '$rootScope', '$compile', 'appConfig', function ($http, $scope, $rootScope, $compile, appConfig) {
 
@@ -1570,16 +2457,16 @@
             case 'ccc':
                 $rootScope.optionselected = 'ccc';
                 break;
-            case 'police':
-                $rootScope.optionselected = 'police';
-                break;
+                /*case 'police':
+                    $rootScope.optionselected = 'police';
+                    break;*/
             case 'clinics':
                 $rootScope.optionselected = 'clinics';
                 break;
             default:
             }
 
-            if ($rootScope.optionselected == 'police')
+            if ($rootScope.optionselected === 'police' || $rootScope.optionselected === 'clinics')
                 appNavigator.pushPage('places.html', {
                     radius: '25000'
                 });
@@ -1648,16 +2535,16 @@
             case 'ccc':
                 $rootScope.optionselected = 'ccc';
                 break;
-            case 'police':
-                $rootScope.optionselected = 'police';
-                break;
+                /*case 'police':
+                    $rootScope.optionselected = 'police';
+                    break;*/
             case 'clinics':
                 $rootScope.optionselected = 'clinics';
                 break;
             default:
             }
 
-            if ($rootScope.optionselected == 'police')
+            if ($rootScope.optionselected === 'police' || $rootScope.optionselected === 'clinics')
                 appNavigator.pushPage('places.html', {
                     radius: '2000',
                     near: '1'
@@ -2858,24 +3745,36 @@
         }
 
     }]);
-    
-    app.controller('supremaController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig','loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
-        
-         $scope.suprema = {}
-         
-         $scope.tarrifTypeList = [
-             
-             {"id":1,"name":"Tariff A"},
-             {"id":2,"name":"Tariff B"},
+
+    app.controller('supremaController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+
+        $scope.suprema = {}
+
+        $scope.tarrifTypeList = [
+
+            {
+                "id": 1,
+                "name": "Tariff A"
+                    },
+            {
+                "id": 2,
+                "name": "Tariff B"
+                    },
          ];
-          $scope.meterStatusList = [
-             
-             {"id":1,"name":"Blocked"},
-             {"id":2,"name":"UnBlocked"},
+        $scope.meterStatusList = [
+
+            {
+                "id": 1,
+                "name": "Blocked"
+                    },
+            {
+                "id": 2,
+                "name": "UnBlocked"
+                    },
          ];
-         
-         $scope.getMeterRegistration = function () {
-             
+
+        $scope.getMeterRegistration = function () {
+
             $scope.API = appConfig.emmsupremaEndPoint;
 
             if (typeof $scope.suprema.tarrifType === 'undefined' && typeof $scope.suprema.startdate === 'undefined' && typeof $scope.suprema.enddate === 'undefined' && typeof $scope.suprema.meterstatus === 'undefined') {
@@ -2895,14 +3794,14 @@
                 $scope.API = $scope.API + '{"tarrifType":"' + $scope.suprema.tarrifType + '","startDate":"' + $scope.suprema.startdate + '","endDate":"' + $scope.suprema.enddate + '","meterstatus":"' + $scope.suprema.meterstatus + '"}';
 
                 $http.get($scope.API).success(function (data) {
-                    
+
                     $scope.meters = data.getTarrif;
 
                     $scope.isFetching = false;
                     modal.hide();
 
                 }).error(function (data, status, headers, config) {
-                    
+
                     $scope.isFetching = false;
                     modal.hide();
 
@@ -2916,7 +3815,7 @@
 
             }
         };
-         
+
      }]);
 
     app.controller('logCallsController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', function ($http, $scope, $rootScope, $sce, appConfig) {
@@ -3032,16 +3931,16 @@
     app.controller('speachSearchController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
 
         function recognizeSpeech() {
-                var maxMatches = 5;
-                var promptString = "Speak now"; // optional
-                var language = "en-US";                     // optional
-                window.plugins.speechrecognizer.startRecognize(function(result){
-                    alert(result);
-                    $scope.recognizedText = result;
-                }, function(errorMessage){
-                    console.log("Error message: " + errorMessage);
-                }, maxMatches, promptString, language);
-            }
+            var maxMatches = 5;
+            var promptString = "Speak now"; // optional
+            var language = "en-US"; // optional
+            window.plugins.speechrecognizer.startRecognize(function (result) {
+                alert(result);
+                $scope.recognizedText = result;
+            }, function (errorMessage) {
+                console.log("Error message: " + errorMessage);
+            }, maxMatches, promptString, language);
+        }
 
     }]);
 

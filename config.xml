@@ -82,6 +82,7 @@
         <gap:plugin name="org.apache.cordova.splashscreen" />
         <gap:plugin name="org.apache.cordova.vibration" />
         <gap:plugin name="onesignal-cordova-plugin" source="npm" />
+        <gap:plugin name="com.sharinglabs.cordova.plugin.datepicker" />
         
 
 
