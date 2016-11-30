@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    var app = angular.module('app', ['onsen', 'angular-images-loaded', 'ngMap', 'nvd3', 'ngMessages']);
+    var app = angular.module('app', ['onsen', 'angular-images-loaded', 'ngMap', 'nvd3', 'ngMessages', 'angularSoap']);
 
     var datePicker;
 
@@ -28,7 +28,7 @@
 
             datePicker = window.plugins.datePicker;
 
-            OAuth.initialize('cxhwciIvEZEjw2e5pVe8ucOB6H8')
+            //OAuth.initialize('cxhwciIvEZEjw2e5pVe8ucOB6H8')
 
             navigator.geolocation.getCurrentPosition(function (position) {
 
@@ -36,6 +36,7 @@
                 $scope.userLng = position.coords.longitude;
 
             }, function (error) {
+
                 console.log("Couldn't get the location of the user.");
 
                 ons.notification.alert({
@@ -58,11 +59,6 @@
                 enableHighAccuracy: true
             });
 
-            // alert dialog dismissed
-            function alertDismissed() {
-                // do something
-            }
-
             var notificationOpenedCallback = function (jsonData) {
 
                 ons.notification.alert({
@@ -73,20 +69,27 @@
                 console.log('didReceiveRemoteNotificationCallBack: ' + JSON.stringify(jsonData));
             };
 
-            window.plugins.OneSignal.getIds(function (ids) {
-                window.localStorage.setItem("pushToken", ids.pushToken);
-                window.localStorage.setItem("userId", ids.userId);
 
-                console.log('pushToken is: ' + window.localStorage.getItem("pushToken"));
-            });
-
-            window.plugins.OneSignal.init("a17d1266-3037-4f13-8c29-e2203d0f3458", {
+            /*window.plugins.OneSignal.init("a17d1266-3037-4f13-8c29-e2203d0f3458", {
                     googleProjectNumber: "1030098960429"
                 },
-                notificationOpenedCallback);
+                notificationOpenedCallback);*/
+
+            window.plugins.OneSignal
+                .startInit("a17d1266-3037-4f13-8c29-e2203d0f3458", "1030098960429")
+                .handleNotificationOpened(notificationOpenedCallback)
+                .endInit();
+
+            /* window.plugins.OneSignal.getIds(function (ids) {
+                 window.localStorage.setItem("pushToken", ids.pushToken);
+                 window.localStorage.setItem("userId", ids.userId);
+
+                 console.log('pushToken is: ' + window.localStorage.getItem("pushToken"));
+             });*/
+
 
             // Show an alert box if a notification comes in when the user is in your app.
-            window.plugins.OneSignal.enableInAppAlertNotification(true);
+            //window.plugins.OneSignal.enableInAppAlertNotification(true);
 
         }, false);
 
@@ -143,8 +146,6 @@
                             window.localStorage.setItem("lastname", data.lastname);
 
                             window.localStorage.setObject('loggedIn', true);
-
-                            appNavigator.pushPage('main-tab.html');
 
                         })
                         .fail(function (jqXHR, textStatus, errorThrown) {
@@ -729,9 +730,18 @@
         }
 
         $scope.placeCall = function (num) {
-            if (window.cordova) {
-                cordova.InAppBrowser.open('tel:' + num.replace(/\s/g, ''), '_system');
-            }
+
+            phonedialer.dial(
+                num.replace(/\s/g, ''),
+                function (err) {
+                    if (err == "empty") alert("Unknown phone number");
+                    else alert("Dialer Error:" + err);
+                },
+                function (success) {
+                    console.log('Dialing succeeded');
+                }
+            );
+
         }
 
         $scope.loadPOIDetails = function (index, marker) {
@@ -1076,6 +1086,109 @@
         });
 
     });
+    
+    
+    app.controller('cemetryController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+
+        $scope.cemetryList = [];
+        $scope.isShowing = false;
+
+        $scope.getCementries = function () {
+
+            $scope.API = appConfig.emmcemetryEndPoint;
+
+            if (typeof $scope.firstname === 'undefined' && typeof $scope.lastname === 'undefined' && typeof $scope.idno === 'undefined') {
+
+                ons.notification.alert({
+                    message: 'This input form not complete!',
+                    modifier: 'material'
+                });
+
+
+            } else {
+
+                $scope.isFetching = true;
+                $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+                modal.show();
+                
+                if (typeof $scope.firstname === 'undefined')
+                    $scope.firstname = '';
+                else if(typeof $scope.lastname === 'undefined')
+                    $scope.lastname = '';
+                else
+                    $scope.idno = '';
+                
+                $scope.API = $scope.API + '{"FIRSTNAME":"' + $scope.firstname + '","SURNAME":"' + $scope.lastname + '","IDNO":"' + $scope.idno + '"}}';
+
+                $http.get($scope.API).success(function (data) {
+
+                    $scope.cemetryList = [];
+                    
+                    if (typeof data.results === 'undefined')
+                        $scope.cemetryList = [data];
+                    else
+                        $scope.cemetryList = data.results;
+
+                    $scope.isFetching = false;
+                    modal.hide();
+
+                }).error(function (data, status, headers, config) {
+
+                    $scope.isFetching = false;
+                    modal.hide();
+
+                    ons.notification.alert({
+                        message: JSON.stringify('Something went wrong'),
+                        modifier: 'material'
+                    });
+
+                });
+
+            }
+        };
+
+
+    }]);
+
+
+    app.controller('notificationsController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+
+        $scope.notificationList = [];
+
+        $scope.getNotificationList = function () {
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            db.transaction(function (tx) {
+
+                tx.executeSql('CREATE TABLE IF NOT EXISTS notifications (id integer primary key, title text, message text)');
+
+                tx.executeSql("INSERT INTO notifications (title, message) VALUES (?,?)", ["Notification", "Testing Tsheko"], function (tx, res) {
+                    console.log("insertId: " + res.insertId + " -- probably 1");
+                    console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");
+
+                }, function (e) {
+                    console.log("ERROR: " + e.message);
+                });
+            });
+
+            //appNavigator.pushPage('notifications.html');
+
+            db.transaction(function (tx) {
+                tx.executeSql("select id,title,message from notifications order by id desc;", [], function (tx, res) {
+                    console.log("res.rows.item(0).message: " + res.rows.item(0).message + " -- should be 1");
+                    $scope.notificationList = res.rows;
+                });
+            });
+
+            $scope.isFetching = false;
+            modal.hide();
+
+        }
+
+    }]);
 
     app.controller('goodsReturnedNotesController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
 
@@ -1588,9 +1701,30 @@
 
     }]);
 
-    app.controller('indigentController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
+    app.controller('indigentController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', '$soap', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService, $soap) {
 
         $scope.aggregatedList = [];
+
+
+        $scope.dialogs = [];
+        $scope.declineReason = "";
+
+
+        $scope.declineReasonList = [
+
+            {
+                "id": 1,
+                "name": "Incomplete information"
+                    },
+            {
+                "id": 2,
+                "name": "The house is not indigent"
+                    },
+            {
+                "id": 3,
+                "name": "Other"
+                    }
+         ];
 
         $scope.initIndigent = function () {
 
@@ -1715,6 +1849,305 @@
 
         }
 
+        $scope.loadAssigments = function () {
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            $scope.API = 'https://munipoiapp.herokuapp.com/api/applications/New';
+
+            console.log($scope.API);
+
+            $http.get($scope.API).success(function (data) {
+
+                $scope.assignmentList = data;
+
+                $scope.isFetching = false;
+                modal.hide();
+
+            }).error(function (data, status, headers, config) {
+
+                $scope.isFetching = false;
+                modal.hide();
+
+                ons.notification.alert({
+                    message: JSON.stringify('Something went wrong'),
+                    modifier: 'material'
+                });
+
+            });
+
+        }
+
+        $scope.loadClosed = function () {
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            $scope.API = 'https://munipoiapp.herokuapp.com/api/applications/Closed';
+
+            console.log($scope.API);
+
+            $http.get($scope.API).success(function (data) {
+
+                $scope.closedList = data;
+
+                $scope.isFetching = false;
+                modal.hide();
+
+            }).error(function (data, status, headers, config) {
+
+                $scope.isFetching = false;
+                modal.hide();
+
+                ons.notification.alert({
+                    message: JSON.stringify('Something went wrong'),
+                    modifier: 'material'
+                });
+
+            });
+
+        }
+
+        $scope.loadAssigmentDetails = function (index, assignment) {
+
+            $scope.id = assignment._id;
+            appNavigator.pushPage('assignmentDetails.html', {
+                id: assignment._id,
+                applicationRefNo: assignment.indigentApplicationDetails.indigentApplicationHeader.applicationRefNo
+            });
+
+        }
+
+        $scope.showAssigmentDetails = function () {
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            var page = appNavigator.getCurrentPage();
+
+            $scope.API = 'https://munipoiapp.herokuapp.com/api/assigments/' + page.options.id;
+
+            window.localStorage.setItem("appId", page.options.id);
+
+            window.localStorage.setItem("applicationRefNo", page.options.applicationRefNo);
+
+            $http.get($scope.API).success(function (data) {
+
+                $scope.assignment = data;
+
+                $scope.isFetching = false;
+                modal.hide();
+
+            }).error(function (data, status, headers, config) {
+
+                $scope.isFetching = false;
+                modal.hide();
+
+                ons.notification.alert({
+                    message: JSON.stringify('Something went wrong'),
+                    modifier: 'material'
+                });
+
+            });
+
+        }
+
+        $scope.showLivingConditionsDetails = function () {
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            var appId = window.localStorage.getItem("appId");
+
+            $scope.API = 'https://munipoiapp.herokuapp.com/api/assigments/' + appId;
+
+            console.log($scope.API);
+
+            $http.get($scope.API).success(function (data) {
+
+                $scope.livingConditions = data;
+
+                $scope.isFetching = false;
+                modal.hide();
+
+            }).error(function (data, status, headers, config) {
+
+                $scope.isFetching = false;
+                modal.hide();
+
+                ons.notification.alert({
+                    message: JSON.stringify('Something went wrong'),
+                    modifier: 'material'
+                });
+
+            });
+
+        }
+
+        $scope.loadLivingConditions = function () {
+
+            appNavigator.pushPage('livingconditions.html', {
+                id: $scope.id
+            });
+        }
+
+        $scope.openCamera = function (selection) {
+
+            var srcType = Camera.PictureSourceType.CAMERA;
+            var options = setOptions(srcType);
+            var func = createNewFileEntry;
+
+            navigator.camera.getPicture(function cameraSuccess(imageUri) {
+
+                if (selection === 1)
+                    $scope.image1 = "data:image/jpeg;base64," + imageUri;
+                else if (selection === 2)
+                    $scope.image2 = "data:image/jpeg;base64," + imageUri;
+                else if (selection === 3)
+                    $scope.image3 = "data:image/jpeg;base64," + imageUri;
+                else if (selection === 4)
+                    $scope.image4 = "data:image/jpeg;base64," + imageUri;
+                else if (selection === 5)
+                    $scope.image5 = "data:image/jpeg;base64," + imageUri;
+                else if (selection === 6)
+                    $scope.image6 = "data:image/jpeg;base64," + imageUri;
+                
+                 console.debug("picture: " + imageUri, "app");
+
+                //displayImage(imageUri);
+                // You may choose to copy the picture, save it somewhere, or upload.
+                //func(imageUri);
+                
+                $scope.$apply();
+
+            }, function cameraError(error) {
+
+                console.debug("Unable to obtain picture: " + error, "app");
+
+                ons.notification.alert({
+                    message: JSON.stringify('Unable to obtain picture: ' + error),
+                    modifier: 'material'
+                });
+
+            }, options);
+        }
+
+        $scope.loadHouseholds = function () {
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            var applicationRefNo = window.localStorage.getItem("applicationRefNo");
+
+            $scope.API = 'https://munipoiapp.herokuapp.com/api/assigments/household/' + applicationRefNo;
+
+            console.log($scope.API);
+
+            $http.get($scope.API).success(function (data) {
+
+                $scope.householdList = data[0].indigentApplicationDetails;
+
+                $scope.isFetching = false;
+                modal.hide();
+
+            }).error(function (data, status, headers, config) {
+
+                $scope.isFetching = false;
+                modal.hide();
+
+                ons.notification.alert({
+                    message: JSON.stringify('Something went wrong'),
+                    modifier: 'material'
+                });
+
+            });
+
+        }
+
+        $scope.viewHouseholdDetails = function (index, household) {
+
+            $scope.household = household;
+
+            appNavigator.pushPage('householdverify.html', {
+                householdmember: JSON.stringify(household)
+            })
+        }
+
+        $scope.loadHouseholdDetails = function () {
+
+            var page = appNavigator.getCurrentPage();
+
+            $scope.household = JSON.parse(page.options.householdmember);
+        }
+
+        var signaturePad;
+
+        $scope.loadSignature = function () {
+
+            var canvas = document.getElementById('signatureCanvas');
+            signaturePad = new SignaturePad(canvas);
+        }
+
+        $scope.saveCanvas = function () {
+            var sigImg = signaturePad.toDataURL();
+            $scope.signature = sigImg;
+        }
+
+        $scope.loadAcceptDialog = function () {
+
+            if (!$scope.dialogs[declineApplicationDialog]) {
+
+                ons.createDialog(declineApplicationDialog, {
+                    parentScope: $rootScope
+                }).then(function (dialog) {
+                    $scope.dialogs[declineApplicationDialog] = dialog;
+                    dialog.show();
+                });
+            } else {
+                $scope.dialogs[declineApplicationDialog].show();
+            }
+            declineApplicationDialog.show();
+        }
+
+        $scope.declineButtonDialog = function () {
+
+            declineApplicationDialog.hide();
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            var applicationRefNo = window.localStorage.getItem("applicationRefNo");
+
+            $scope.API = 'http://196.15.242.146:5555/rest/EMMShared/resources/updateFieldWorkerTaskStatus/{"taskStatus":"Accepted","applicationId":"' + applicationRefNo + '","reasonForRejection":"' + $scope.declineReason + '"}';
+
+            $http.get($scope.API).success(function (data) {
+
+                appNavigator.pushPage('assigments.html');
+
+                $scope.isFetching = false;
+                modal.hide();
+
+            }).error(function (data, status, headers, config) {
+
+                $scope.isFetching = false;
+                modal.hide();
+
+                ons.notification.alert({
+                    message: JSON.stringify('Something went wrong'),
+                    modifier: 'material'
+                });
+
+            });
+
+        }
+
     }]);
 
     app.controller('hrController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
@@ -1731,7 +2164,7 @@
 
 
             d3.json(appConfig.emmHRinfoEndPoint, function (data) {
-                
+
                 $scope.employeeList = data.results;
 
                 //Female
@@ -1823,7 +2256,8 @@
                         .showControls(false); //Allow user to switch between "Grouped" and "Stacked" mode.
 
                     chart.yAxis
-                        .tickFormat(d3.format(',.2f'));
+                        .tickFormat(d3.format(',.0f'));
+
                     chart.groupSpacing(0);
                     chart.height(900);
 
@@ -1872,12 +2306,12 @@
                     });
 
                 });
-                
-                 
-            d3.json(appConfig.emmHRinfoEndPoint, function (data) {
-                
-                $scope.employeeList = data.results;
-            });
+
+
+                d3.json(appConfig.emmHRinfoEndPoint, function (data) {
+
+                    $scope.employeeList = data.results;
+                });
 
             }, function (error) {
 
@@ -1906,43 +2340,43 @@
         $scope.showMarker = function (event) {
 
             $scope.marker = $scope.markers[this.id];
-            
+
             var count = $scope.employeeList.reduce(function (n, person) {
-                        return n + (person.TOWN_OR_CITY == $scope.marker.title);
-                    }, 0);
-            
+                return n + (person.TOWN_OR_CITY == $scope.marker.title);
+            }, 0);
+
             var femalecount = $scope.employeeList.reduce(function (n, person) {
-                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.SEX == 'F');
-                    }, 0);
-            
+                return n + (person.TOWN_OR_CITY == $scope.marker.title && person.SEX == 'F');
+            }, 0);
+
             var malecount = $scope.employeeList.reduce(function (n, person) {
-                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.SEX == 'M');
-                    }, 0);
-            
+                return n + (person.TOWN_OR_CITY == $scope.marker.title && person.SEX == 'M');
+            }, 0);
+
             var Over50count = $scope.employeeList.reduce(function (n, person) {
-                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'Over50');
-                    }, 0);
-            
+                return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'Over50');
+            }, 0);
+
             var LessThan45count = $scope.employeeList.reduce(function (n, person) {
-                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan45');
-                    }, 0);
-            
+                return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan45');
+            }, 0);
+
             var LessThan40count = $scope.employeeList.reduce(function (n, person) {
-                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan40');
-                    }, 0);
-            
+                return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan40');
+            }, 0);
+
             var LessThan35count = $scope.employeeList.reduce(function (n, person) {
-                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan35');
-                    }, 0);
-            
+                return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan35');
+            }, 0);
+
             var LessThan30count = $scope.employeeList.reduce(function (n, person) {
-                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan30');
-                    }, 0);
-            
+                return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan30');
+            }, 0);
+
             var LessThan25count = $scope.employeeList.reduce(function (n, person) {
-                        return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan25');
-                    }, 0);
-            
+                return n + (person.TOWN_OR_CITY == $scope.marker.title && person.AGEGROUP == 'LessThan25');
+            }, 0);
+
             $scope.infoWindow = {
                 id: $scope.marker.id,
 
@@ -1960,7 +2394,104 @@
 
         }]);
 
+    app.controller('ehealthController', ['$http', '$scope', '$rootScope', '$sce', 'appConfig', 'loadingMessageService', function ($http, $scope, $rootScope, $sce, appConfig, loadingMessageService) {
 
+        $scope.aggregatedList = [];
+        $scope.departmentList = [];
+        $scope.divisionList = [];
+        $scope.typeList = [];
+        var responseData = [];
+        
+        $scope.selectedDepartment = 'undefined', $scope.selectedDivision ='undefined', $scope.selectedMedicalType = 'undefined';
+
+        $scope.initEHealthInfo = function () {
+
+            $scope.isFetching = true;
+            $rootScope.didYouKnowMessage = loadingMessageService.showMessage();
+            modal.show();
+
+            $scope.departmentList = [];
+
+            $scope.API = appConfig.emmEhealthinfoEndPoint;
+
+            $http.get($scope.API).success(function (response) {
+                
+                responseData = response.results;
+
+                for (var i = 0; i < responseData.length; i++) {
+
+                    if ($scope.departmentList.indexOf(responseData[i].DEPDESCR) < 0)
+                        $scope.departmentList.push(responseData[i].DEPDESCR);
+
+                }
+
+                $scope.isFetching = false;
+                modal.hide();
+
+            });
+
+            $scope.$watch('selectedDepartment', function (newVal) {
+
+                $scope.divisionList = [];
+                
+                $scope.typeList = [];
+                
+                for (var i = 0; i < responseData.length; i++) {
+
+                    if (newVal === responseData[i].DEPDESCR) {
+
+                        if ($scope.divisionList.indexOf(responseData[i].BLDGDESCR) < 0)
+                            $scope.divisionList.push(responseData[i].BLDGDESCR);
+                    }
+
+                }
+            });
+            
+            $scope.$watch('selectedDivision', function (newVal) {
+
+                $scope.typeList = [];
+                
+                for (var i = 0; i < responseData.length; i++) {
+
+                    if (newVal === responseData[i].BLDGDESCR) {
+
+                        if ($scope.typeList.indexOf(responseData[i].DESCR) < 0)
+                            $scope.typeList.push(responseData[i].DESCR);
+                    }
+
+                }
+            });
+
+        }
+        
+        $scope.getEHealthInfo = function () {
+            
+            $scope.aggregatedList = [];
+            
+            if (($scope.selectedDepartment === "undefined") || ($scope.selectedDivision === "undefined") || ($scope.selectedMedicalType) === "undefined") {
+
+                ons.notification.alert({
+                    message: 'Please select all three dropdowns!',
+                    modifier: 'material'
+                });
+
+
+            } else {
+            
+            for (var i = 0; i < responseData.length; i++) {
+
+                    if ($scope.selectedDepartment === responseData[i].DEPDESCR && $scope.selectedDivision === responseData[i].BLDGDESCR && $scope.selectedMedicalType === responseData[i].DESCR) {
+
+                            $scope.aggregatedList.push({amount:responseData[i].PURCHPRICE, datepurchased:responseData[i].PURCHDATE, device:responseData[i].DESCR});
+                    }
+
+                }
+            }
+            
+        }
+
+    }]);
+   
     app.controller('mapController', ['$http', '$scope', '$rootScope', '$compile', 'appConfig', function ($http, $scope, $rootScope, $compile, appConfig) {
 
         $scope.map;
@@ -2949,7 +3480,6 @@
 
     }]);
 
-
     app.controller('userProfileController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
 
         $scope.dialogs = {};
@@ -3928,7 +4458,7 @@
 
 }]);
 
-    app.controller('speachSearchController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
+    /*app.controller('speachSearchController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
 
         function recognizeSpeech() {
             var maxMatches = 5;
@@ -3942,7 +4472,7 @@
             }, maxMatches, promptString, language);
         }
 
-    }]);
+    }]);*/
 
     app.controller('talkToCounsellorController', ['$scope', '$rootScope', '$sce', '$http', function ($scope, $rootScope, $sce, $http) {
 

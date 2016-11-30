@@ -125,6 +125,10 @@
     width: 110px;
 }
 
+.living-conditions {
+    padding: 5px;
+}
+
 .ons-icon[fixed-width="true"]
 {
   width: 5em;

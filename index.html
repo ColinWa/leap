@@ -11,6 +11,7 @@
     <title>LEAP</title>
 
     <!-- All our CSS -->
+    <link rel="stylesheet" href="css/signature-pad.css">
     <link rel="stylesheet" href="lib/onsen/css/onsenui.css">
     <link rel="stylesheet" href="css/onsen-css-components.css">
     <link rel="stylesheet" href="css/plugins.css" />
@@ -106,6 +107,10 @@
     <script src="lib/onsen/js/angular/angular-touch.js"></script>
     <script src="lib/angular-messages.min.js"></script>
     
+    <script src="lib/soapclient.js"></script>
+    <script src="lib/angular.soap.js"></script>
+    <script src="lib/signature_pad.js"></script>
+    
     <script src="lib/onsen/js/onsenui.js"></script>
     <script src="lib/swiper.js"></script>
     <script src="lib/d3.js"></script>
@@ -113,6 +118,7 @@
     <script src="lib/angular-nvd3.js"></script>
     <script src="js/plugins.js"></script>
     <script src="js/oauth.js"></script>
+    <script src="js/ng-cordova.js"></script>
     <script src="cordova.js"></script>
     <script src="js/app.js"></script>
     <script src="js/config.js"></script>
@@ -121,7 +127,7 @@
 
 <body ng-controller="networkController">
 
-    <ons-navigator var="appNavigator" page="main-tab.html"></ons-navigator>
+    <ons-navigator var="appNavigator" page="main-menu.html"></ons-navigator>
 
     <!-- <ons-navigator var="appNavigator" page="signinsocial.html"></ons-navigator>-->
 
@@ -213,7 +219,20 @@
         </p>
 
     </ons-dialog>
-
+    
+    <ons-alert-dialog animation="default" var="declineApplicationDialog" ng-controller="indigentController" cancelable>
+    <div class="alert-dialog-title">Decline this application</div>
+    <div class="alert-dialog-content">
+      <ons-list-item>
+            <select ng-model="declineReason" ng-options="reason.id as reason.name for reason in declineReasonList">
+            </select>
+        </ons-list-item>
+    </div>
+    <div class="alert-dialog-footer">
+      <button class="alert-dialog-button" ng-click="declineButtonDialog()">Decline</button>
+    </div>
+  </ons-alert-dialog>
+    
     <ons-dialog var="meterInfoDialog" ng-controller="userProfileController" cancelable>
 
         <ons-toolbar inline>
