@@ -21,6 +21,7 @@
         "/Users/mac/Apps/leap/providers/services/twitter-provider.js",
         "/Users/mac/Apps/leap/bower_components/d3/d3.min.js",
         "/Users/mac/Apps/leap/bower_components/d3/d3.js",
-        "/Users/mac/Apps/leap/bower_components/Chart.js/test/scale.time.tests.js"
+        "/Users/mac/Apps/leap/bower_components/Chart.js/test/scale.time.tests.js",
+        "/Users/mac/Apps/leap/test/test.js"
     ]
 }

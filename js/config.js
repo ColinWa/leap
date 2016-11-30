@@ -19,7 +19,15 @@ app
   emmpasswordrecoveryapiEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMPerson/resources/recoverPassword/{',
   emmretrievecomplaintapiEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMMobiApp/resource/retrieveComplaint',
   emmsupremaEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMSuprema/resources/getPrepaidVending/',
-    
+  emmlocationEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMLocation/resources/location/',
+  emmfleetEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMLocation/resources/fleet/',
+  emmemployeeEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMPerson/resources/person/',
+  emmpurchaseorderEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMTransactionalEvents/resources/fleet/',    
+  emmtransactionaleventsEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMTransactionalEvents/resources/transactionalEvents/',
+  emmIdigentEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMReporting/resources/indigentMonthlyReports',
+  emmHRinfoEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMHR/resources/getEmployeesPerDept/',
+  emmEhealthinfoEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMEHealth/resources/getMedAssetAmount',
+  emmcemetryEndPoint : 'http://wmdev.ekurhuleni.gov.za:5555/rest/EMMCemetery/resources/personDetails/',
   notificationapiEndPoint : 'https://onesignal.com/api/v1/notifications'
 
   
